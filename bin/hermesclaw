@@ -1,0 +1,79 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════
+# HermesClaw v1.0 - 主命令入口
+# ═══════════════════════════════════════════════════════
+
+HERMES_DIR="/Users/bh1gmj/Documents/MobileClaw/macOS/hermesclaw2.0"
+CONFIG_DIR="${HERMES_DIR}/config"
+SCRIPTS_DIR="${HERMES_DIR}/scripts"
+SCRIPTS_V3="${HERMES_DIR}/scripts-v3"
+
+command="${1:-help}"
+
+show_help() {
+    cat <<'EOF'
+🐿️  HermesClaw v1.0 - 多智能体调度系统
+
+命令:
+  help              显示帮助
+  install           首次安装向导
+  add               添加智能体
+  edit              编辑智能体
+  delete            删除智能体
+  list              列出所有智能体
+  qrcode            生成微信配置二维码
+  status            检查服务状态
+  dispatch <agent>: 调用指定智能体
+  dispatch all      调用所有智能体
+
+微信使用:
+  <agent_id>:问题   → 调用单个智能体
+  all:问题          → 调用所有智能体
+  all:聚合分析问题   → 深度聚合分析
+
+示例:
+  hermesclaw install
+  hermesclaw add                    → 交互式添加
+  hermesclaw dispatch all "报到"     → 全部调用
+EOF
+}
+
+case "$command" in
+    help|--help|-h)
+        show_help
+        ;;
+    install|setup)
+        python3 "${SCRIPTS_DIR}/setup.py" install
+        ;;
+    add)
+        python3 "${SCRIPTS_DIR}/setup.py" add
+        ;;
+    edit)
+        python3 "${SCRIPTS_DIR}/setup.py" edit
+        ;;
+    delete|remove)
+        python3 "${SCRIPTS_DIR}/setup.py" delete
+        ;;
+    list|ls)
+        python3 "${SCRIPTS_DIR}/setup.py" list
+        ;;
+    qrcode|qr)
+        python3 "${SCRIPTS_DIR}/wechat_qr.py"
+        ;;
+    status)
+        python3 "${SCRIPTS_V3}/dispatch.py" status
+        ;;
+    dispatch)
+        shift
+        cd "$SCRIPTS_V3" && python3 dispatch.py "$@"
+        ;;
+    test)
+        echo "🧪 运行测试..."
+        cd "$SCRIPTS_V3" && python3 dispatch.py all "报到"
+        ;;
+    *)
+        echo "❌ 未知命令: $command"
+        show_help
+        exit 1
+        ;;
+esac

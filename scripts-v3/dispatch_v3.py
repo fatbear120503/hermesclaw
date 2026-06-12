@@ -184,33 +184,79 @@ def call_model(name: str, query: str) -> dict:
 # 并发调用 + 智能聚合
 # ══════════════════════════════════════
 
-AGG_TIMEOUT = 25  # all: 模式总等待秒数，超时的模型不参与聚合
+AGG_TIMEOUT = 35  # all: 模式总等待秒数，超时的模型不参与聚合
 
 def call_all_models(query: str) -> dict:
-    """并发调用所有启用的模型，总超时 15 秒，先到先聚合"""
+    """两阶段调用所有启用的模型：
+    Phase 1: 并发调用云端 API（cherry, wb、placeholder）
+    Phase 2: 串行调用本地 Hermes（避免并发冲突）
+    """
     all_models = {**CONFIG.get("models", {}), **CONFIG.get("templates", {})}
     enabled = [k for k, v in all_models.items()
-               if v.get("enabled", False) and v["type"] != "placeholder"]
+               if v.get("enabled", False)]
+
+    # 分类：云端 API vs 本地服务
+    cloud_api = []   # cherry, wb, placeholder（OpenClaw）
+    local_api = []   # hermes 等本地模型
+
+    for name in enabled:
+        cfg = all_models.get(name, {})
+        model_type = cfg.get("type", "")
+        if model_type == "placeholder":
+            cloud_api.append(name)  # OpenClaw 占位符，直接处理
+        elif model_type == "openai_api" and "localhost" in cfg.get("endpoint", ""):
+            local_api.append(name)  # 本地服务
+        else:
+            cloud_api.append(name)  # 云端 API
 
     results = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        futures = {pool.submit(call_model, name, query): name for name in enabled}
-        # 总超时：最多等 AGG_TIMEOUT 秒
-        done, not_done = wait(futures.keys(), timeout=AGG_TIMEOUT)
+    elapsed_start = time.time()
 
-        for future in done:
-            name = futures[future]
-            try:
-                results[name] = future.result()
-            except Exception as e:
-                results[name] = {"name": name, "content": f"[异常: {e}]", "elapsed": 0, "error": True}
+    # ═══════════════════════════════════════════════════════
+    # Phase 1: 并发调用云端 API
+    # ═══════════════════════════════════════════════════════
+    phase1_timeout = min(20, AGG_TIMEOUT)
+    if cloud_api:
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            futures = {pool.submit(call_model, name, query): name for name in cloud_api}
+            done, not_done = wait(futures.keys(), timeout=phase1_timeout)
 
-        for future in not_done:
-            name = futures[future]
+            for future in done:
+                name = futures[future]
+                try:
+                    results[name] = future.result()
+                except Exception as e:
+                    results[name] = {"name": name, "content": f"[异常: {e}]", "elapsed": round(time.time() - elapsed_start, 2), "error": True}
+
+            for future in not_done:
+                name = futures[future]
+                cfg = all_models.get(name, {})
+                results[name] = {"name": cfg.get("name", name),
+                                "content": f"[⏳ 响应较慢]",
+                                "elapsed": phase1_timeout, "error": True, "timeout": True}
+
+    # ═══════════════════════════════════════════════════════
+    # Phase 2: 串行调用本地 Hermes（避免并发崩溃）
+    # ═══════════════════════════════════════════════════════
+    if local_api and (time.time() - elapsed_start) < AGG_TIMEOUT:
+        remaining_time = AGG_TIMEOUT - (time.time() - elapsed_start)
+        hermes_timeout = min(25, remaining_time)
+
+        for name in local_api:
             cfg = all_models.get(name, {})
-            results[name] = {"name": cfg.get("name", name),
-                            "content": f"[⏳ 响应较慢，稍后单独呼叫我查看]",
-                            "elapsed": AGG_TIMEOUT, "error": True, "timeout": True}
+            t0 = time.time()
+            try:
+                # 直接调用，不用线程池（串行，避免并发冲突）
+                result = call_model(name, query)
+                # 如果 call_model 内部超时，elapsed 已经计算好了
+                if time.time() - t0 > hermes_timeout:
+                    result["timeout"] = True
+                    result["elapsed"] = round(time.time() - t0, 2)
+                results[name] = result
+            except Exception as e:
+                results[name] = {"name": cfg.get("name", name),
+                                "content": f"[⚡ Hermes 本地调用失败: {str(e)[:80]}]",
+                                "elapsed": round(time.time() - t0, 2), "error": True}
 
     return results
 
@@ -603,7 +649,20 @@ def main():
             print("错误: 需要提供消息内容", file=sys.stderr)
             sys.exit(1)
 
-        print(f"🔄 正在并发调用所有启用的模型...\n")
+        print(f"🔄 正在并发调用所有启用的模型...")
+
+        # 检测是否启用聚合分析模式
+        AGGREGATE_TRIGGER = "聚合分析"
+        aggregate_mode = AGGREGATE_TRIGGER in message
+        if aggregate_mode:
+            # 去掉 "聚合分析" 关键字，保留真正的问题
+            message = message.replace(AGGREGATE_TRIGGER, "").strip()
+            if not message:
+                print("错误: 请提供要问的内容（在聚合分析后面）", file=sys.stderr)
+                sys.exit(1)
+            print(f"   📊 聚合分析模式：并发请求后将生成综合对比")
+        
+        print()
         results = call_all_models(message)
 
         # 展示各模型回复
@@ -624,8 +683,14 @@ def main():
                 if len(r["content"]) > 800:
                     print("... (已截断)")
 
-        # 智能聚合（all: 模式下跳过，加快返回速度）
-        aggregate = {"enabled": False, "note": "快速模式已跳过聚合分析"}
+        # 智能聚合：仅在 "all:聚合分析" 模式下启用
+        if aggregate_mode:
+            print("\n" + "=" * 60)
+            print("📊 聚合分析")
+            print("=" * 60)
+            aggregate = smart_aggregate(message, results)
+        else:
+            aggregate = {"enabled": False, "note": "快速模式（如需深度分析，请使用 all:聚合分析）"}
 
         if aggregate.get("enabled"):
             if "stats" in aggregate:
@@ -636,8 +701,8 @@ def main():
             print(f"\n{aggregate['analysis']}")
         elif "error" in aggregate:
             print(f"\n⚠️ {aggregate['error']}")
-        else:
-            print("\n⚠️ 聚合分析已禁用")
+        elif not aggregate_mode:
+            print(f"💡 {aggregate['note']}")
 
         # JSON 输出（供程序调用）
         output = {

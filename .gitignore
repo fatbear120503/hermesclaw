@@ -1,9 +1,17 @@
+# Dependencies
+node_modules/
+*.egg-info/
+
+# Cache
 __pycache__/
 *.pyc
-venv/
-node_modules/
-*.log
-.DS_Store
 .hermesclaw-cache/
+
+# Config (敏感信息)
 config/.env
-tests/jest.config.js
+config/.env.backup
+config/*.real
+
+# OS
+.DS_Store
+Thumbs.db

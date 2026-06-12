@@ -1,143 +1,74 @@
 #!/bin/bash
-
-# HermesClaw 安装脚本
-# 支持 macOS 和 Linux
+# ═══════════════════════════════════════════════════════
+# HermesClaw v1.0 - 安装脚本
+# ═══════════════════════════════════════════════════════
 
 set -e
 
-echo "🦀 HermesClaw 安装程序"
-echo "======================="
+echo "🐿️  HermesClaw v1.0 安装程序"
+echo "=============================="
+echo ""
 
-# 检查系统
+# 检测系统
 if [[ "$OSTYPE" == "darwin"* ]]; then
     OS="macos"
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    OS="linux"
 else
-    echo "❌ 不支持的操作系统: $OSTYPE"
-    exit 1
+    OS="linux"
 fi
 
-echo "📋 检测到系统: $OS"
+echo "📋 系统: $OS"
+echo ""
 
-# 检查依赖
-check_dependency() {
-    if command -v $1 &> /dev/null; then
-        echo "✅ $1 已安装"
-        return 0
-    else
-        echo "❌ $1 未安装"
-        return 1
+# 检查 Python
+check_python() {
+    python3 --version > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "❌ Python 3 未安装"
+        echo "   macOS: brew install python"
+        exit 1
     fi
+    echo "✅ Python $(python3 --version)"
 }
 
+check_python
+
+# 安装依赖
 echo ""
-echo "🔍 检查依赖..."
+echo "📦 安装依赖..."
+pip3 install -q qrcode[pil] 2>/dev/null || echo "⚠️ qrcode 可选，稍后扫码功能可能不可用"
 
-MISSING_DEPS=()
+echo "✅ 依赖安装完成"
 
-if ! check_dependency python3; then
-    MISSING_DEPS+=("python3")
-fi
+# 设置权限
+echo ""
+echo "🔐 设置权限..."
+chmod +x bin/hermesclaw
+chmod +x scripts/setup.py
+chmod +x scripts/wechat_qr.py
+chmod +x scripts-v3/dispatch.py
+echo "✅ 权限设置完成"
 
-if ! check_dependency pip3; then
-    MISSING_DEPS+=("pip3")
-fi
-
-if ! check_dependency node; then
-    MISSING_DEPS+=("node")
-fi
-
-if ! check_dependency npm; then
-    MISSING_DEPS+=("npm")
-fi
-
-if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
+# 首次配置引导
+echo ""
+echo "🚀 启动配置向导..."
+printf "
+would you like to run the setup wizard now? [Y/n]: "
+read -r response
+if [[ "$response" =~ ^([nN][oO]|[nN])$ ]]; then
     echo ""
-    echo "⚠️  缺少以下依赖: ${MISSING_DEPS[*]}"
-    echo "请先安装依赖后再运行安装脚本"
-    
-    if [[ "$OS" == "macos" ]]; then
-        echo "💡 建议使用 Homebrew 安装:"
-        echo "   brew install python node"
-    else
-        echo "💡 使用包管理器安装:"
-        echo "   sudo apt-get install python3 python3-pip nodejs npm"
-    fi
-    
-    exit 1
-fi
-
-# 安装 Router
-echo ""
-echo "📦 安装 Router..."
-cd router
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cd ..
-
-# 安装 Plugin
-echo ""
-echo "📦 安装 Plugin..."
-cd plugin
-npm install
-cd ..
-
-# 创建启动脚本
-echo ""
-echo "🚀 创建启动脚本..."
-
-cat > start.sh << 'EOF'
-#!/bin/bash
-
-echo "🦀 启动 HermesClaw..."
-
-# 启动 Router
-echo "📡 启动 Router..."
-cd router
-source venv/bin/activate
-python run.py &
-ROUTER_PID=$!
-cd ..
-
-# 启动 Plugin
-echo "🔌 启动 Plugin..."
-cd plugin
-npm start &
-PLUGIN_PID=$!
-cd ..
-
-echo ""
-echo "✅ HermesClaw 已启动"
-echo "   Router: http://localhost:18889"
-echo "   Plugin: http://localhost:3001"
-echo ""
-echo "按 Ctrl+C 停止"
-
-# 等待中断
-trap "kill $ROUTER_PID $PLUGIN_PID; exit" INT
-wait
-EOF
-
-chmod +x start.sh
-
-# 创建配置
-echo ""
-echo "⚙️  创建默认配置..."
-if [ ! -f config/.env ]; then
-    cp config/.env.example config/.env
-    echo "✅ 已创建 config/.env"
+    echo "💡 跳过向导。稍后运行: hermesclaw install"
+else
+    python3 scripts/setup.py install
 fi
 
 echo ""
-echo "🎉 安装完成!"
+echo "🎉 HermesClaw v1.0 安装完成！"
 echo ""
-echo "使用方式:"
-echo "   启动: ./start.sh"
-echo "   配置: 编辑 config/.env"
-echo "   测试: pytest tests/"
+echo "使用方法:"
+echo "   hermesclaw help       → 查看帮助"
+echo "   hermesclaw install    → 配置智能体"
+echo "   hermesclaw add        → 添加新智能体"
+echo "   hermesclaw list       → 列出已配置"
+echo "   hermesclaw qrcode     → 生成微信二维码"
+echo "   hermesclaw test       → 测试 all: 模式"
 echo ""
-echo "文档:"
-echo "   README.md       - 项目说明"
-echo "   DEVELOPMENT.md  - 开发文档"
