@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+venv/
+node_modules/
+*.log
+.DS_Store
+.hermesclaw-cache/
+config/.env
+tests/jest.config.js

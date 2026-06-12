@@ -1,0 +1,23 @@
+{
+  "name": "hermesclaw-plugin",
+  "version": "0.1.0",
+  "description": "OpenClaw Plugin for HermesClaw Multi-Agent Router",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "keywords": ["openclaw", "hermesclaw", "multi-agent", "router"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.0"
+  }
+}

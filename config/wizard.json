@@ -1,0 +1,59 @@
+{
+  "router": {
+    "host": "0.0.0.0",
+    "port": 18889,
+    "log_level": "info"
+  },
+  "agents": {
+    "hm": {
+      "name": "Hermes Agent",
+      "endpoint": "http://localhost:9119",
+      "description": "本地 AI 服务 (SenseNova 6.7 Flash-Lite)",
+      "enabled": true,
+      "mode": "service"
+    },
+    "cherry": {
+      "name": "Cherry Agent",
+      "base_url": "https://apihub.agnes-ai.com/v1",
+      "description": "Agnes AI (OpenAI兼容API)",
+      "enabled": true,
+      "mode": "api",
+      "model": "agnes-2.0-flash"
+    },
+    "wb": {
+      "name": "WorkBuddy Agent",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "description": "硅基流动 (Qwen/Qwen3-8B)",
+      "enabled": true,
+      "mode": "api",
+      "model": "Qwen/Qwen3-8B"
+    }
+  },
+  "prefixes": {
+    "hm:": "hm",
+    "cherry:": "cherry",
+    "wb:": "wb",
+    "both:": "both",
+    "all:": "all",
+    "oc:": "oc"
+  },
+  "plugin": {
+    "port": 3001,
+    "max_retries": 3,
+    "retry_delay": 1000
+  },
+  "aggregate_groups": {
+    "both": [
+      "cherry",
+      "wb"
+    ],
+    "all": [
+      "cherry",
+      "wb"
+    ]
+  },
+  "openclaw": {
+    "gateway": "http://localhost:18789",
+    "auto_route": true
+  }
+}
