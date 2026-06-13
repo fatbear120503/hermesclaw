@@ -1,17 +1,10 @@
-# Dependencies
-node_modules/
-*.egg-info/
-
-# Cache
-__pycache__/
-*.pyc
-.hermesclaw-cache/
-
-# Config (敏感信息)
+# HermesClaw - never commit real keys
 config/.env
 config/.env.backup
-config/*.real
-
-# OS
+!.env.example
+.env
+*.local
+node_modules/
+__pycache__/
 .DS_Store
-Thumbs.db
+*.pyc

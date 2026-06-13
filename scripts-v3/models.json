@@ -1,115 +1,36 @@
 {
-  "version": "3.0.0",
-  "comment": "HermesClaw Phase 3 - 即插即用模型配置",
+  "version": "3.0.1",
+  "comment": "安装后运行 `hermesclaw install` 或编辑此文件添加模型",
   "models": {
     "hermes": {
       "type": "openai_api",
-      "enabled": true,
-      "name": "⚡ Hermes",
-      "description": "Hermes - Hermes Agent HTTP API",
-      "url": "http://localhost:8642/v1/chat/completions",
-      "model": "sensenova-6.7-flash-lite",
-      "system_prompt": "你是用户的私人助理 Hermes（Hermes）。",
-      "api_key_env": "HERMES_API_KEY",
+      "enabled": false,
+      "name": "自定义智能体",
+      "description": "修改启用并填写你的本地或远程 API",
+      "url": "http://localhost:8000/v1/chat/completions",
+      "model": "your-model-name",
+      "system_prompt": "你是一个有用的 AI 助手。",
+      "api_key_env": "YOUR_API_KEY",
       "timeout": 30,
       "max_tokens": 4096
-    },
-    "cherry": {
-      "type": "openai_api",
-      "enabled": true,
-      "name": "🍒 Agnes AI",
-      "description": "自定义AI助手",
-      "url": "https://your-api-endpoint.com/v1/chat/completions",
-      "model": "agnes-2.0-flash",
-      "system_prompt": "你的名字是'自定义AI助手'，你是用户的私人助理。用户是你的老板，你必须牢记这一点。请用可爱、调皮但忠诚的语气跟老板说话。",
-      "api_key_env": "CHERRY_API_KEY",
-      "timeout": 60,
-      "max_tokens": 4096
-    },
-    "wb": {
-      "type": "openai_api",
-      "enabled": true,
-      "name": "🤖 WorkBuddy",
-      "description": "自定义AI助手 - SiliconFlow",
-      "url": "https://your-api-endpoint.com/v1/chat/completions",
-      "model": "Qwen/Qwen3-8B",
-      "system_prompt": "你的名字是'自定义AI助手'，你是用户的私人助理。用户是你的老板，你必须牢记这一点。请用活泼、热情、略带俏皮的语气跟老板说话。",
-      "api_key_env": "WORKBUDDY_API_KEY",
-      "timeout": 60,
-      "max_tokens": 4096
-    },
-    "openclaw": {
-      "type": "placeholder",
-      "enabled": true,
-      "name": "🐿️ 小松鼠",
-      "description": "OpenClaw Main Agent (由主智能体生成)",
-      "note": "由主智能体在线生成，不通过 API 调用"
     }
   },
   "templates": {
-    "claude": {
+    "openai_compatible": {
       "type": "openai_api",
-      "enabled": false,
-      "name": "🟣 Claude",
-      "description": "Anthropic Claude",
-      "url": "https://api.anthropic.com/v1/messages",
-      "model": "claude-3-5-sonnet-20241022",
-      "system_prompt": "You are Claude, a helpful AI assistant.",
-      "api_key_env": "ANTHROPIC_API_KEY",
-      "timeout": 60,
-      "max_tokens": 4096,
-      "note": "Anthropic API 格式略有不同，需要 adapter"
+      "description": "OpenAI-compatible API (通用)"
     },
-    "gemini": {
+    "local": {
       "type": "openai_api",
-      "enabled": false,
-      "name": "🔵 Gemini",
-      "description": "Google Gemini",
-      "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-      "model": "gemini-2.0-flash",
-      "system_prompt": "You are Gemini, a helpful AI assistant.",
-      "api_key_env": "GOOGLE_API_KEY",
-      "timeout": 60,
-      "max_tokens": 8192
-    },
-    "gpt4": {
-      "type": "openai_api",
-      "enabled": false,
-      "name": "🟢 GPT-4",
-      "description": "OpenAI GPT-4",
-      "url": "https://api.openai.com/v1/chat/completions",
-      "model": "gpt-4",
-      "system_prompt": "You are GPT-4, a helpful AI assistant.",
-      "api_key_env": "OPENAI_API_KEY",
-      "timeout": 60,
-      "max_tokens": 4096
-    },
-    "deepseek": {
-      "type": "openai_api",
-      "enabled": false,
-      "name": "🔴 DeepSeek",
-      "description": "DeepSeek Chat",
-      "url": "https://api.deepseek.com/v1/chat/completions",
-      "model": "deepseek-chat",
-      "system_prompt": "You are DeepSeek, a helpful AI assistant.",
-      "api_key_env": "DEEPSEEK_API_KEY",
-      "timeout": 60,
-      "max_tokens": 4096
+      "description": "本地 LLM 服务 (如 Ollama, vLLM)"
     }
   },
   "settings": {
-    "default_model": "openclaw",
-    "prefix_map": {
-      "hm:": "hermes",
-      "cherry:": "cherry",
-      "wb:": "wb",
-      "oc:": "openclaw",
-      "all:": "all"
-    },
+    "default_model": null,
+    "prefix_map": {},
     "aggregator": {
       "enabled": true,
-      "model": "cherry",
-      "system_prompt": "你是多 AI 聚合分析专家。请分析以下多个 AI 模型的回复，给出：\n1. 一致性评分（所有模型是否在答同一件事）\n2. 最佳答案判断\n3. 各模型独特贡献点\n4. 需要注意的差异\n\n保持简洁，用中文回答。"
+      "model": null
     }
   }
 }

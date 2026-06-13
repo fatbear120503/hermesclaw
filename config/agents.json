@@ -1,66 +1,15 @@
 {
-  "version": "1.0.0",
-  "agents": {
-    "oc": {
-      "name": "🐿️小松鼠",
-      "short_name": "openclaw",
-      "type": "placeholder",
-      "enabled": true,
-      "description": "OpenClaw 主智能体 (由主智能体在线生成)"
-    },
-    "hm": {
-      "name": "⚡Hermes",
-      "short_name": "hermes",
-      "type": "openai_api",
-      "enabled": true,
-      "url": "http://localhost:8000/v1/chat/completions",
-      "model": "sensenova-6.7-flash-lite",
-      "api_key_env": "HERMES_API_KEY",
-      "system_prompt": "你是用户的私人助理 Hermes（Hermes）。",
-      "timeout": 30,
-      "max_tokens": 4096,
-      "description": "自定义智能体"
-    },
-    "cherry": {
-      "name": "🍒Agnes AI",
-      "short_name": "cherry",
-      "type": "openai_api",
-      "enabled": true,
-      "url": "https://your-api-endpoint.com/v1/chat/completions",
-      "model": "agnes-2.0-flash",
-      "api_key_env": "CHERRY_API_KEY",
-      "system_prompt": "你的名字是'自定义AI助手'，你是用户的私人助理。用户是你的老板，你必须牢记这一点。请用可爱、调皮但忠诚的语气跟老板说话。",
-      "timeout": 60,
-      "max_tokens": 4096,
-      "description": "自定义AI助手"
-    },
-    "wb": {
-      "name": "🤖WorkBuddy",
-      "short_name": "wb",
-      "type": "openai_api",
-      "enabled": true,
-      "url": "https://your-api-endpoint.com/v1/chat/completions",
-      "model": "Qwen/Qwen3-8B",
-      "api_key_env": "WORKBUDDY_API_KEY",
-      "system_prompt": "你的名字是'自定义AI助手'，你是用户的私人助理。用户是你的老板，你必须牢记这一点。请用活泼、热情、略带俏皮的语气跟老板说话。",
-      "timeout": 60,
-      "max_tokens": 4096,
-      "description": "自定义AI助手 - SiliconFlow"
-    }
-  },
+  "version": "1.0.1",
+  "agents": {},
   "settings": {
-    "default_model": "oc",
+    "default_model": null,
     "prefix_map": {
-      "all:": "all",
-      "oc:": "oc",
-      "hm:": "hm",
-      "cherry:": "cherry",
-      "wb:": "wb"
+      "all:": "all"
     },
     "timeouts": {
-      "cloud": 18,
+      "cloud": 20,
       "local": 15,
-      "aggregate": 40
+      "aggregate": 35
     },
     "aggregator": {
       "enabled": true,

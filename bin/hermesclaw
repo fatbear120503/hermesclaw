@@ -1,9 +1,35 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════
-# HermesClaw v1.0 - 主命令入口
+# HermesClaw v1.0.1 - 主命令入口（动态路径探测）
 # ═══════════════════════════════════════════════════════
 
-HERMES_DIR="/Users/bh1gmj/Documents/MobileClaw/macOS/hermesclaw2.0"
+# 自动探测安装目录（优先 /usr/local，回退到本地包）
+find_hermes_dir() {
+    local script_path=""
+    if [ -L "$0" ]; then
+        script_path=$(readlink "$0" 2>/dev/null || echo "$0")
+    else
+        script_path="$0"
+    fi
+    script_path="$(cd "$(dirname "$script_path")" && pwd)"
+    
+    # 如果脚本在 /usr/local/hermesclaw/bin/ 下 → 用 /usr/local
+    if echo "$script_path" | grep -q "/usr/local/hermesclaw"; then
+        echo "/usr/local/hermesclaw"
+        return
+    fi
+    
+    # 否则尝试 /usr/local（PKG 安装后的标准路径）
+    if [ -d "/usr/local/hermesclaw/bin" ]; then
+        echo "/usr/local/hermesclaw"
+        return
+    fi
+    
+    # 最后回退到开发/本地路径（绝对路径解析）
+    cd "$script_path" && cd .. && pwd
+}
+
+HERMES_DIR="$(find_hermes_dir)"
 CONFIG_DIR="${HERMES_DIR}/config"
 SCRIPTS_DIR="${HERMES_DIR}/scripts"
 SCRIPTS_V3="${HERMES_DIR}/scripts-v3"
@@ -12,7 +38,7 @@ command="${1:-help}"
 
 show_help() {
     cat <<'EOF'
-🐿️  HermesClaw v1.0 - 多智能体调度系统
+🐿️  HermesClaw v1.0.1 - 多智能体调度系统
 
 命令:
   help              显示帮助
