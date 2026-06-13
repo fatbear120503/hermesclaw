@@ -1,11 +1,11 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════
-# HermesClaw v1.0.1 - 安装脚本
+# HermesClaw v1.0 - 安装脚本
 # ═══════════════════════════════════════════════════════
 
 set -e
 
-echo "🐿️  HermesClaw v1.0.1 安装程序"
+echo "🐿️  HermesClaw v1.0 安装程序"
 echo "=============================="
 echo ""
 
@@ -62,7 +62,7 @@ else
 fi
 
 echo ""
-echo "🎉 HermesClaw v1.0.1 安装完成！"
+echo "🎉 HermesClaw v1.0 安装完成！"
 echo ""
 echo "使用方法:"
 echo "   hermesclaw help       → 查看帮助"

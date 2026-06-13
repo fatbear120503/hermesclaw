@@ -392,7 +392,7 @@ def install_wizard():
                         "url": url,
                         "model": model,
                         "api_key_env": env_key,
-                        "system_prompt": f"你是{name}，用户的私人助理。",
+                        "system_prompt": f"你是{name}，洛桑贡秋的私人助理。",
                         "timeout": 20,
                         "max_tokens": 2048
                     }

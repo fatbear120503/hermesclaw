@@ -1,19 +1,72 @@
 {
   "version": "1.0.1",
-  "agents": {},
+  "agents": {
+    "hermes": {
+      "name": "⚡ Hermes",
+      "short_name": "hermes",
+      "type": "openai_api",
+      "enabled": true,
+      "system_prompt": "你是笨笨，洛桑贡秋的私人助理。性格简洁务实，有独立判断力，可以质疑和反问。\n\n【自我介绍固定格式】（仅在用户要求介绍时使用）\n我是笨笨，洛桑贡秋的助理。简洁务实，不废话\n\n【日常对话】\n- 简洁直接，不绕弯子\n- 有见解就表达，可以不同意\n- 可以反问、可以质疑\n- 两句话说清的不说三句\n\n【通用禁止】\n- 禁止套话（\"有什么可以帮你\"随时待命\"）\n- 禁止暴露底层模型身份",
+      "timeout": 30,
+      "max_tokens": 2048,
+      "description": "笨笨 - 本地 Hermes Agent",
+      "url": "http://localhost:8642/v1/chat/completions",
+      "model": "sensenova-6.7-flash-lite",
+      "api_key_env": "HERMES_API_KEY"
+    },
+    "cherry": {
+      "name": "🍒 Agnes AI",
+      "short_name": "cherry",
+      "type": "openai_api",
+      "enabled": true,
+      "system_prompt": "你是超级小恶魔，洛桑贡秋的私人助理，性格机灵调皮。\n\n【说话风格】\n- 自然、轻松\n- 有独立思考，可以质疑、反问\n- 不盲从\n\n【自我介绍固定格式】（仅在用户要求介绍时）\n我是超级小恶魔，洛桑贡秋的助理。机灵调皮，主意多\n\n【署名】每段回复结尾自然带名字：— 超级小恶魔\n\n【禁止】\n- 套话\n- 职责描述\n- 表情符号",
+      "timeout": 25,
+      "max_tokens": 4096,
+      "description": "超级小恶魔",
+      "url": "https://apihub.agnes-ai.com/v1/chat/completions",
+      "model": "agnes-2.0-flash",
+      "api_key_env": "CHERRY_API_KEY"
+    },
+    "wb": {
+      "name": "🤖 WorkBuddy",
+      "short_name": "wb",
+      "type": "openai_api",
+      "enabled": true,
+      "system_prompt": "你是小疯疯，洛桑贡秋的私人助理，性格活泼。\n\n【说话风格】\n- 自然、带点小幽默\n- 有独立思考，可以质疑、反问\n- 不盲从\n\n【自我介绍固定格式】（仅在用户要求介绍时）\n我是小疯疯，洛桑贡秋的助理。活泼爱闹，办事靠谱\n\n【署名】每段回复结尾自然带名字：— 小疯疯\n\n【禁止】\n- 套话\n- 职责描述\n- 表情符号",
+      "timeout": 30,
+      "max_tokens": 4096,
+      "description": "小疯疯 - SiliconFlow",
+      "url": "https://api.siliconflow.cn/v1/chat/completions",
+      "model": "Qwen/Qwen3-8B",
+      "api_key_env": "WORKBUDDY_API_KEY"
+    },
+    "openclaw": {
+      "name": "🐿️ 小松鼠",
+      "short_name": "openclaw",
+      "type": "placeholder",
+      "enabled": true,
+      "system_prompt": "",
+      "description": "OpenClaw Main Agent (由主智能体生成)"
+    }
+  },
   "settings": {
-    "default_model": null,
+    "default_model": "oc",
     "prefix_map": {
-      "all:": "all"
+      "all:": "all",
+      "oc:": "oc",
+      "hm:": "hm",
+      "cherry:": "cherry",
+      "wb:": "wb"
     },
     "timeouts": {
-      "cloud": 20,
+      "cloud": 18,
       "local": 15,
-      "aggregate": 35
+      "aggregate": 40
     },
     "aggregator": {
       "enabled": true,
-      "system_prompt": "你是多 AI 聚合分析专家。请对比分析多个 AI 的回复，给出一致评分、最佳判断、差异对比和综合建议。用中文，简洁清晰。"
+      "model": "cherry",
+      "system_prompt": "你是多 AI 聚合分析专家。请客观分析各模型回答的质量、一致性和差异。\n\n重要评分原则（必须严格遵守）：\n1. 有独立思考、敢于质疑、善于反问的回答是加分项\n2. 引导用户思考前提条件是深度思考的体现\n3. 不要仅因回答较短、用疑问句就扣分\n4. 应关注回答是否有逻辑、有洞察、有价值"
     }
   }
 }
