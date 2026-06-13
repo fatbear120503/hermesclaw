@@ -1,10 +1,10 @@
 #!/bin/bash
 # OpenClaw Gateway 一键安装脚本
-# 固定安装路径: /Users/bh1gmj/Documents/kimi/workspace/hermesclaw/openclaw-gateway
+# 固定安装路径: ~Documents/kimi/workspace/hermesclaw/openclaw-gateway
 
 set -e
 
-PROJECT_DIR="/Users/bh1gmj/Documents/kimi/workspace/hermesclaw/openclaw-gateway"
+PROJECT_DIR="~Documents/kimi/workspace/hermesclaw/openclaw-gateway"
 
 echo "=== OpenClaw Gateway 安装 ==="
 echo "目标路径: ${PROJECT_DIR}"
@@ -441,9 +441,9 @@ GATEWAY_PORT=18888
 SQUIRREL_BACKEND=ollama
 SQUIRREL_URL=http://localhost:11434
 SQUIRREL_MODEL=deepseek-r1:8b
-SENSENOVA_API_KEY=sk-xxx
+SENSENOVA_API_KEY=your_api_key_here
 CHERRY_BASE_URL=https://api.openai.com/v1
-CHERRY_API_KEY=sk-xxx
+CHERRY_API_KEY=your_api_key_here
 CHERRY_MODEL=gpt-4o
 TXTEOF
 
